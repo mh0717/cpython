@@ -36,6 +36,8 @@ unzip -q libfftw3.xcframework.zip
 unzip -q libfftw3_threads.xcframework.zip
 unzip -q ios_system.xcframework.zip
 
+curl -OL https://github.com/mh0717/PythonAux/releases/download/0.1/liblzma.a
+
 popd
 
 # Set to 1 if you have gfortran for arm64 installed. gfortran support is highly experimental.

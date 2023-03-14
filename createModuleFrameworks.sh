@@ -72,12 +72,13 @@ edit_Info_plist_noSimulator()
 # You can build the lzma modyle by adding the lzma headers in the Include path and adding _lzma to this list,
 # but you can't submit to the AppStore.
 # Retrying lzma with a static library version:
-for name in _bz2 _cffi_backend _crypt _ctypes _ctypes_test _curses _dbm _decimal _hashlib _lsprof _lzma _multiprocessing _opcode _posixshmem _queue _sqlite3 _ssl _testbuffer _testcapi _testimportmultiple _testinternalcapi _testmultiphase _xxsubinterpreters _xxtestfuzz syslog xxlimited 
+for name in _bz2 _cffi_backend _crypt _ctypes _ctypes_test _dbm _decimal _hashlib _lsprof _lzma _multiprocessing _opcode _posixshmem _queue _sqlite3 _ssl _testbuffer _testcapi _testimportmultiple _testinternalcapi _testmultiphase _xxsubinterpreters _xxtestfuzz syslog xxlimited 
 do 
-	for package in python3_ios pythonA pythonB pythonC pythonD pythonE
+	touch Library/lib/python3.11/${name}.cpython-311-darwin.so
+	for package in python3_ios #pythonA pythonB pythonC pythonD pythonE
 	do
 		framework=${package}-${name}
-		for architecture in lib.macosx-${OSX_VERSION}-x86_64-3.11 lib.darwin-arm64-3.11 lib.darwin-x86_64-3.11
+		for architecture in lib.macosx-${OSX_VERSION}-x86_64-3.11 lib.darwin-arm64-3.11 #lib.darwin-x86_64-3.11
 		do
 			echo "Creating: " ${architecture}/Frameworks/${name}.framework
 			directory=build/${architecture}/Frameworks/
@@ -96,6 +97,10 @@ do
 			install_name_tool -change $libpython @rpath/${package}.framework/${package}  $directory/$framework.framework/$framework
 			install_name_tool -id @rpath/$framework.framework/$framework  $directory/$framework.framework/$framework
 			
+			# remove unneeded symbols, only keep _PyInit_*
+			echo _PyInit_${name} > symbols.txt
+			/usr/bin/strip -u -r -A -s symbols.txt $directory/$framework.framework/$framework
+			rm symbols.txt
 		done
 		edit_Info_plist $framework
 		# Create the 3-architecture XCFramework:
@@ -104,7 +109,7 @@ do
 	done
 done
 
-
+exit 0
 
 # argon2/_ffi, cryptography/hazmat/bindings/_padding, cryptography//hazmat/bindings/_openssl and cryptography/hazmat/bindings/_rust. 
 # Separate because suffix is .abi3.so
@@ -113,7 +118,7 @@ for library in _argon2_cffi_bindings/_ffi cryptography/hazmat/bindings/_padding 
 do
 	# replace all "/" with "."
 	name=${library//\//.}
-	for package in python3_ios pythonA pythonB pythonC pythonD pythonE
+	for package in python3_ios #pythonA pythonB pythonC pythonD pythonE
 	do
 		framework=${package}-${name}
 		for architecture in lib.macosx-${OSX_VERSION}-x86_64-3.11 lib.darwin-arm64-3.11 lib.darwin-x86_64-3.11
