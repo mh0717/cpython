@@ -69,96 +69,96 @@ downloadSource()
    fi
 }
 
-# 1) compile for OSX (required)
-find . -name \*.o -delete
-rm -rf Library/lib/python3.11/site-packages/* 
-find Library -type f -name direct_url.jsonbak -delete
-env CC=clang CXX=clang++ CPPFLAGS="-isysroot $OSX_SDKROOT" CFLAGS="-isysroot $OSX_SDKROOT" CXXFLAGS="-isysroot $OSX_SDKROOT" LDFLAGS="-isysroot $OSX_SDKROOT -lz" LDSHARED="clang -v -undefined error -dynamiclib -isysroot $OSX_SDKROOT -lz -L. -lpython3.11" OPT="$DEBUG" ./configure --prefix=$PREFIX/Library --with-system-ffi --enable-shared \
-    $EXTRA_CONFIGURE_FLAGS_OSX \
-	--without-computed-gotos \
-	ac_cv_file__dev_ptmx=no \
-	ac_cv_file__dev_ptc=no \
-	ac_cv_func_getentropy=no \
-	ac_cv_func_sendfile=no \
-	ac_cv_func_setregid=no \
-	ac_cv_func_setreuid=no \
-	ac_cv_func_setsid=no \
-	ac_cv_func_setpgid=no \
-	ac_cv_func_setpgrp=no \
-	ac_cv_func_setuid=no \
-    ac_cv_func_forkpty=no \
-    ac_cv_func_openpty=no \
-	ac_cv_func_clock_settime=no >& configure_osx.log
-# enable-framework incompatible with local install
-# Other functions copied from iOS so packages are consistent
-mkdir -p $PREFIX/Frameworks_macosx
-mkdir -p $PREFIX/Frameworks_macosx/lib
-mkdir -p $PREFIX/Frameworks_macosx/include
-rm -rf Frameworks_macosx/openblas.framework
-# The build scripts from numpy need openblas to be in a dylib, not a framework (to detect lapack functions)
-# So we create the dylib from the framework:
-# TODO: add openssl and zmq headers and libraries here as well (requires changing Python-aux build scripts)
-cp -r $XCFRAMEWORKS_DIR/libfftw3.xcframework/macos-x86_64/Headers/* $PREFIX/Frameworks_macosx/include/
-cp $XCFRAMEWORKS_DIR/libfftw3.xcframework/macos-x86_64/libfftw3.a $PREFIX/Frameworks_macosx/lib/
-cp $XCFRAMEWORKS_DIR/libfftw3_threads.xcframework/macos-x86_64/libfftw3_threads.a $PREFIX/Frameworks_macosx/lib/
+# # 1) compile for OSX (required)
+# find . -name \*.o -delete
+# rm -rf Library/lib/python3.11/site-packages/* 
+# find Library -type f -name direct_url.jsonbak -delete
+# env CC=clang CXX=clang++ CPPFLAGS="-isysroot $OSX_SDKROOT" CFLAGS="-isysroot $OSX_SDKROOT" CXXFLAGS="-isysroot $OSX_SDKROOT" LDFLAGS="-isysroot $OSX_SDKROOT -lz" LDSHARED="clang -v -undefined error -dynamiclib -isysroot $OSX_SDKROOT -lz -L. -lpython3.11" OPT="$DEBUG" ./configure --prefix=$PREFIX/Library --with-system-ffi --enable-shared \
+#     $EXTRA_CONFIGURE_FLAGS_OSX \
+# 	--without-computed-gotos \
+# 	ac_cv_file__dev_ptmx=no \
+# 	ac_cv_file__dev_ptc=no \
+# 	ac_cv_func_getentropy=no \
+# 	ac_cv_func_sendfile=no \
+# 	ac_cv_func_setregid=no \
+# 	ac_cv_func_setreuid=no \
+# 	ac_cv_func_setsid=no \
+# 	ac_cv_func_setpgid=no \
+# 	ac_cv_func_setpgrp=no \
+# 	ac_cv_func_setuid=no \
+#     ac_cv_func_forkpty=no \
+#     ac_cv_func_openpty=no \
+# 	ac_cv_func_clock_settime=no >& configure_osx.log
+# # enable-framework incompatible with local install
+# # Other functions copied from iOS so packages are consistent
+# mkdir -p $PREFIX/Frameworks_macosx
+# mkdir -p $PREFIX/Frameworks_macosx/lib
+# mkdir -p $PREFIX/Frameworks_macosx/include
+# rm -rf Frameworks_macosx/openblas.framework
+# # The build scripts from numpy need openblas to be in a dylib, not a framework (to detect lapack functions)
+# # So we create the dylib from the framework:
+# # TODO: add openssl and zmq headers and libraries here as well (requires changing Python-aux build scripts)
+# cp -r $XCFRAMEWORKS_DIR/libfftw3.xcframework/macos-x86_64/Headers/* $PREFIX/Frameworks_macosx/include/
+# cp $XCFRAMEWORKS_DIR/libfftw3.xcframework/macos-x86_64/libfftw3.a $PREFIX/Frameworks_macosx/lib/
+# cp $XCFRAMEWORKS_DIR/libfftw3_threads.xcframework/macos-x86_64/libfftw3_threads.a $PREFIX/Frameworks_macosx/lib/
 
-cp $XCFRAMEWORKS_DIR/openblas.xcframework/macos-x86_64/openblas.framework/Headers/* $PREFIX/Frameworks_macosx/include/
-cp  $XCFRAMEWORKS_DIR/openblas.xcframework/macos-x86_64/openblas.framework/openblas $PREFIX/Frameworks_macosx/lib/libopenblas.dylib
-install_name_tool -id $PREFIX/Frameworks_macosx/lib/libopenblas.dylib   $PREFIX/Frameworks_macosx/lib/libopenblas.dylib
+# cp $XCFRAMEWORKS_DIR/openblas.xcframework/macos-x86_64/openblas.framework/Headers/* $PREFIX/Frameworks_macosx/include/
+# cp  $XCFRAMEWORKS_DIR/openblas.xcframework/macos-x86_64/openblas.framework/openblas $PREFIX/Frameworks_macosx/lib/libopenblas.dylib
+# install_name_tool -id $PREFIX/Frameworks_macosx/lib/libopenblas.dylib   $PREFIX/Frameworks_macosx/lib/libopenblas.dylib
 
-cp -r $XCFRAMEWORKS_DIR/libgeos_c.xcframework/macos-x86_64/libgeos_c.framework/Headers/* $PREFIX/Frameworks_macosx/include/
-cp -r $XCFRAMEWORKS_DIR/libgeos_c.xcframework/macos-x86_64/libgeos_c.framework  $PREFIX/Frameworks_macosx/
-rm -rf $PREFIX/Frameworks_macosx/include/gdal
-cp -r $XCFRAMEWORKS_DIR/libgdal.xcframework/macos-x86_64/libgdal.framework/Headers $PREFIX/Frameworks_macosx/include/gdal
-cp -r $XCFRAMEWORKS_DIR/libgdal.xcframework/macos-x86_64/libgdal.framework  $PREFIX/Frameworks_macosx/
-cp -r $XCFRAMEWORKS_DIR/libproj.xcframework/macos-x86_64/libproj.framework/Headers/* $PREFIX/Frameworks_macosx/include
-cp -r $XCFRAMEWORKS_DIR/libproj.xcframework/macos-x86_64/libproj.framework  $PREFIX/Frameworks_macosx/
-cp  /usr/local/lib/libgfortran.dylib $PREFIX/Frameworks_macosx/lib/libgfortran.dylib 
-# TODO: add downloading of proj data set + install in Library/share/proj.
-#
-rm -rf build/lib.macosx-${OSX_VERSION}-x86_64-3.11
-make -j 4 >& make_osx.log
-# exit 0 # Debugging embedded packages in Modules/Setup
-mkdir -p build/lib.macosx-${OSX_VERSION}-x86_64-3.11  > $PREFIX/make_install_osx.log 2>&1
-cp libpython3.11.dylib build/lib.macosx-${OSX_VERSION}-x86_64-3.11  >> $PREFIX/make_install_osx.log 2>&1
-make  -j 4 install  >> $PREFIX/make_install_osx.log 2>&1
-export PYTHONHOME=$PREFIX/Library
-# When working on frozen importlib, we need to compile twice:
-# Otherwise, we can comment the next 7 lines
-# make regen-importlib >> $PREFIX/make_osx.log 2>&1
-# find . -name \*.o -delete  >> $PREFIX/make_osx.log 2>&1
-# make  -j 4 >> $PREFIX/make_osx.log 2>&1 
-# mkdir -p build/lib.macosx-${OSX_VERSION}-x86_64-3.11  >> $PREFIX/make_install_osx.log 2>&1
+# cp -r $XCFRAMEWORKS_DIR/libgeos_c.xcframework/macos-x86_64/libgeos_c.framework/Headers/* $PREFIX/Frameworks_macosx/include/
+# cp -r $XCFRAMEWORKS_DIR/libgeos_c.xcframework/macos-x86_64/libgeos_c.framework  $PREFIX/Frameworks_macosx/
+# rm -rf $PREFIX/Frameworks_macosx/include/gdal
+# cp -r $XCFRAMEWORKS_DIR/libgdal.xcframework/macos-x86_64/libgdal.framework/Headers $PREFIX/Frameworks_macosx/include/gdal
+# cp -r $XCFRAMEWORKS_DIR/libgdal.xcframework/macos-x86_64/libgdal.framework  $PREFIX/Frameworks_macosx/
+# cp -r $XCFRAMEWORKS_DIR/libproj.xcframework/macos-x86_64/libproj.framework/Headers/* $PREFIX/Frameworks_macosx/include
+# cp -r $XCFRAMEWORKS_DIR/libproj.xcframework/macos-x86_64/libproj.framework  $PREFIX/Frameworks_macosx/
+# cp  /usr/local/lib/libgfortran.dylib $PREFIX/Frameworks_macosx/lib/libgfortran.dylib 
+# # TODO: add downloading of proj data set + install in Library/share/proj.
+# #
+# rm -rf build/lib.macosx-${OSX_VERSION}-x86_64-3.11
+# make -j 4 >& make_osx.log
+# # exit 0 # Debugging embedded packages in Modules/Setup
+# mkdir -p build/lib.macosx-${OSX_VERSION}-x86_64-3.11  > $PREFIX/make_install_osx.log 2>&1
 # cp libpython3.11.dylib build/lib.macosx-${OSX_VERSION}-x86_64-3.11  >> $PREFIX/make_install_osx.log 2>&1
-# cp python.exe build/lib.macosx-${OSX_VERSION}-x86_64-3.11/python3.11  >> $PREFIX/make_install_osx.log 2>&1
-# make  -j 4 install >> $PREFIX/make_install_osx.log 2>&1
-# We should make this automatic, but it's not part of Python make install:
-cp -r Lib/venv/scripts/ios Library/lib/python3.11/venv/scripts/  >> $PREFIX/make_install_osx.log 2>&1
-cp $PREFIX/Library/bin/python3.11 $PREFIX >> make_osx.log 2>&1
+# make  -j 4 install  >> $PREFIX/make_install_osx.log 2>&1
+# export PYTHONHOME=$PREFIX/Library
+# # When working on frozen importlib, we need to compile twice:
+# # Otherwise, we can comment the next 7 lines
+# # make regen-importlib >> $PREFIX/make_osx.log 2>&1
+# # find . -name \*.o -delete  >> $PREFIX/make_osx.log 2>&1
+# # make  -j 4 >> $PREFIX/make_osx.log 2>&1 
+# # mkdir -p build/lib.macosx-${OSX_VERSION}-x86_64-3.11  >> $PREFIX/make_install_osx.log 2>&1
+# # cp libpython3.11.dylib build/lib.macosx-${OSX_VERSION}-x86_64-3.11  >> $PREFIX/make_install_osx.log 2>&1
+# # cp python.exe build/lib.macosx-${OSX_VERSION}-x86_64-3.11/python3.11  >> $PREFIX/make_install_osx.log 2>&1
+# # make  -j 4 install >> $PREFIX/make_install_osx.log 2>&1
+# # We should make this automatic, but it's not part of Python make install:
+# cp -r Lib/venv/scripts/ios Library/lib/python3.11/venv/scripts/  >> $PREFIX/make_install_osx.log 2>&1
+# cp $PREFIX/Library/bin/python3.11 $PREFIX >> make_osx.log 2>&1
 
 
-# Force reinstall and upgrade of pip, setuptools 
-echo Starting package installation  >> $PREFIX/make_install_osx.log 2>&1
-python3.11 -m pip install pip --upgrade >> $PREFIX/make_install_osx.log 2>&1
-python3.11 -m pip install setuptools --upgrade >> $PREFIX/make_install_osx.log 2>&1
-python3.11 -m pip install setuptools-rust --upgrade >> $PREFIX/make_install_osx.log 2>&1
-python3.11 -m pip install setuptools_scm --upgrade >> $PREFIX/make_install_osx.log 2>&1
+# # Force reinstall and upgrade of pip, setuptools 
+# echo Starting package installation  >> $PREFIX/make_install_osx.log 2>&1
+# python3.11 -m pip install pip --upgrade >> $PREFIX/make_install_osx.log 2>&1
+# python3.11 -m pip install setuptools --upgrade >> $PREFIX/make_install_osx.log 2>&1
+# python3.11 -m pip install setuptools-rust --upgrade >> $PREFIX/make_install_osx.log 2>&1
+# python3.11 -m pip install setuptools_scm --upgrade >> $PREFIX/make_install_osx.log 2>&1
 
 
-# OSX install of cffi: we need to recompile or Python crashes. 
-# TODO: edit cffi code if static variables inside function create problems.
-python3.11 -m pip uninstall cffi -y >> $PREFIX/make_install_osx.log 2>&1
-pushd packages >> $PREFIX/make_install_osx.log 2>&1
-downloadSource cffi >> $PREFIX/make_install_osx.log 2>&1
-pushd cffi-* >> $PREFIX/make_install_osx.log 2>&1
-rm -rf build/* >> $PREFIX/make_install_osx.log 2>&1
-cp ../setup_cffi.py ./setup.py  >> $PREFIX/make_install_osx.log 2>&1
-env CC=clang CXX=clang++ CPPFLAGS="-isysroot $OSX_SDKROOT" CFLAGS="-isysroot $OSX_SDKROOT" CXXFLAGS="-isysroot $OSX_SDKROOT" LDFLAGS="-isysroot $OSX_SDKROOT " LDSHARED="clang -v -undefined error -dynamiclib -isysroot $OSX_SDKROOT -lz -L$PREFIX -lpython3.11 -lc++ " python3.11 setup.py build  >> $PREFIX/make_install_osx.log 2>&1
-# python3.11 -m pip install cffi --upgrade >> $PREFIX/make_install_osx.log 2>&1
-cp build/lib.macosx-${OSX_VERSION}-x86_64-*/_cffi_backend.cpython-311-darwin.so $PREFIX/build/lib.macosx-${OSX_VERSION}-x86_64-3.11/  >> $PREFIX/make_install_osx.log 2>&1
-env CC=clang CXX=clang++ CPPFLAGS="-isysroot $OSX_SDKROOT" CFLAGS="-isysroot $OSX_SDKROOT" CXXFLAGS="-isysroot $OSX_SDKROOT" LDFLAGS="-isysroot $OSX_SDKROOT " LDSHARED="clang -v -undefined error -dynamiclib -isysroot $OSX_SDKROOT -lz -L$PREFIX -lpython3.11 -lc++ " python3.11 -m pip install . >> $PREFIX/make_install_osx.log 2>&1
-popd  >> $PREFIX/make_install_osx.log 2>&1
-popd  >> $PREFIX/make_install_osx.log 2>&1
+# # OSX install of cffi: we need to recompile or Python crashes. 
+# # TODO: edit cffi code if static variables inside function create problems.
+# python3.11 -m pip uninstall cffi -y >> $PREFIX/make_install_osx.log 2>&1
+# pushd packages >> $PREFIX/make_install_osx.log 2>&1
+# downloadSource cffi >> $PREFIX/make_install_osx.log 2>&1
+# pushd cffi-* >> $PREFIX/make_install_osx.log 2>&1
+# rm -rf build/* >> $PREFIX/make_install_osx.log 2>&1
+# cp ../setup_cffi.py ./setup.py  >> $PREFIX/make_install_osx.log 2>&1
+# env CC=clang CXX=clang++ CPPFLAGS="-isysroot $OSX_SDKROOT" CFLAGS="-isysroot $OSX_SDKROOT" CXXFLAGS="-isysroot $OSX_SDKROOT" LDFLAGS="-isysroot $OSX_SDKROOT " LDSHARED="clang -v -undefined error -dynamiclib -isysroot $OSX_SDKROOT -lz -L$PREFIX -lpython3.11 -lc++ " python3.11 setup.py build  >> $PREFIX/make_install_osx.log 2>&1
+# # python3.11 -m pip install cffi --upgrade >> $PREFIX/make_install_osx.log 2>&1
+# cp build/lib.macosx-${OSX_VERSION}-x86_64-*/_cffi_backend.cpython-311-darwin.so $PREFIX/build/lib.macosx-${OSX_VERSION}-x86_64-3.11/  >> $PREFIX/make_install_osx.log 2>&1
+# env CC=clang CXX=clang++ CPPFLAGS="-isysroot $OSX_SDKROOT" CFLAGS="-isysroot $OSX_SDKROOT" CXXFLAGS="-isysroot $OSX_SDKROOT" LDFLAGS="-isysroot $OSX_SDKROOT " LDSHARED="clang -v -undefined error -dynamiclib -isysroot $OSX_SDKROOT -lz -L$PREFIX -lpython3.11 -lc++ " python3.11 -m pip install . >> $PREFIX/make_install_osx.log 2>&1
+# popd  >> $PREFIX/make_install_osx.log 2>&1
+# popd  >> $PREFIX/make_install_osx.log 2>&1
 
 
 # compile for iOS:

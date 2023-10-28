@@ -3046,11 +3046,11 @@ call_ll_exitfuncs(_PyRuntimeState *runtime)
 void _Py_NO_RETURN
 Py_Exit(int sts)
 {
-    if (Py_FinalizeEx() < 0) {
-        sts = 120;
-    }
+    // if (Py_FinalizeEx() < 0) {
+    //     sts = 120;
+    // }
 
-    exit(sts);
+    // exit(sts);
 }
 
 

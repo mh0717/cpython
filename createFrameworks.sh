@@ -11,7 +11,7 @@ export PREFIX=$PWD
 for name in python3_ios #pythonA pythonB pythonC pythonD pythonE
 do 
 	framework=${name}
-	for architecture in lib.macosx-${OSX_VERSION}-x86_64-3.11 lib.darwin-arm64-3.11 #lib.darwin-x86_64-3.11
+	for architecture in lib.darwin-arm64-3.11 #lib.macosx-${OSX_VERSION}-x86_64-3.11 lib.darwin-x86_64-3.11
 	do
 		echo "Creating: " ${architecture}/Frameworks/${name}.framework
 		directory=build/${architecture}/Frameworks/
