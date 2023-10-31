@@ -2406,7 +2406,7 @@ _imp_create_dynamic_impl(PyObject *module, PyObject *spec, PyObject *file)
         char nameC[MAXPATHLEN];
         strcpy(nameC, PyUnicode_AsUTF8(name));
         // New special case to reduce number of modules: all numpy modules are merged into one:
-        if ((strcmp(nameC, "numpy.core._operand_flag_tests") == 0) || 
+        /*if ((strcmp(nameC, "numpy.core._operand_flag_tests") == 0) || 
                 (strcmp(nameC, "numpy.core._multiarray_umath") == 0) || 
                 (strcmp(nameC, "numpy.core._multiarray_tests") == 0) || 
                 (strcmp(nameC, "numpy.core._simd") == 0) || 
@@ -2654,8 +2654,24 @@ _imp_create_dynamic_impl(PyObject *module, PyObject *spec, PyObject *file)
                 (strcmp(nameC, "statsmodels.tsa.exponential_smoothing._ets_smooth") == 0) ||
                 (strcmp(nameC, "statsmodels.tsa._stl") == 0)) {
             strcpy(nameC, "statsmodels_all");
+        }*/
+
+        sprintf(newPathString, "%s/Frameworks/python3_ios-%s.framework/python3_ios-%s", getenv("APPDIR"), nameC, nameC);
+        printf("%s", newPathString);
+        if (lstat(newPathString, &statbuf) != 0 || statbuf.st_size <= 0) {
+            char* p = strchr(nameC, '.');
+            if (p != NULL) {
+                *p = '\0';
+            }
+            sprintf(newPathString, "%s/Frameworks/python3_ios-%s_all.framework/python3_ios-%s_all", getenv("APPDIR"), nameC, nameC);
+            printf("%s", newPathString);
         }
-        wchar_t pythonName[12];
+        if (lstat(newPathString, &statbuf) != 0 || statbuf.st_size <= 0) {
+            // python3_ios-python3_all
+            sprintf(newPathString, "%s/Frameworks/python3_ios-python3_all.framework/python3_ios-python3_all", getenv("APPDIR"));
+            printf("%s", newPathString);
+        }
+        /* wchar_t pythonName[12];
         if (argc > 0) {
             wcscpy(pythonName, argv_orig[0]);
         } else {
@@ -2675,7 +2691,7 @@ _imp_create_dynamic_impl(PyObject *module, PyObject *spec, PyObject *file)
         } else {
             // If it did not work, we call getenv("APPDIR")
             sprintf(newPathString, "%s/Frameworks/%S-%s.framework/%S-%s", getenv("APPDIR"), pythonName, nameC, pythonName, nameC);
-        }
+        }*/
         // fprintf(stderr, "New path in _imp_create_dynamic_impl: %s\n", newPathString);
         path = PyUnicode_FromString(newPathString);
         PyObject_SetAttrString(spec, "origin", path);

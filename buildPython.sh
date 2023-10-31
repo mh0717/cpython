@@ -217,6 +217,7 @@ rm libpython3.11.dylib
 rm libpython3.11.a
 rm -f Programs/_testembed Programs/_freeze_importlib
 # preadv / pwritev are iOS 14+ only
+
 env CC=clang CXX=clang++ \
 	CPPFLAGS="-arch arm64 -miphoneos-version-min=14.0 -isysroot $IOS_SDKROOT -I$PREFIX/Frameworks_iphoneos/include" \
 	CFLAGS="-arch arm64 -miphoneos-version-min=14.0 -isysroot $IOS_SDKROOT -I$PREFIX/Frameworks_iphoneos/include" \
@@ -244,6 +245,7 @@ env CC=clang CXX=clang++ \
     ac_cv_func_forkpty=no \
     ac_cv_func_openpty=no \
 	ac_cv_func_clock_settime=no >& configure_ios.log
+
 # --without-pymalloc  when debugging memory
 # --enable-framework fails with iOS compilers
 rm -rf build/lib.darwin-arm64-3.11
