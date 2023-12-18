@@ -49,6 +49,7 @@ _Py_GetMainConfig(void)
 static inline int
 _Py_ThreadCanHandleSignals(PyInterpreterState *interp)
 {
+    // for PYDE
     return 1;
     // return (_Py_IsMainThread() && _Py_IsMainInterpreter(interp));
 }
