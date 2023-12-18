@@ -3,6 +3,9 @@
 # jupyter-something adds pandas-1.5.3 and pyzmq-25.0b1, which breaks things down 
 # So far, the "fix" is to manually remove them. 
 
+export AR=/usr/bin/ar
+export RANLIB=/usr/bin/ranlib
+
 # Changed install prefix so multiple install coexist
 export PREFIX=$PWD
 export XCFRAMEWORKS_DIR=$PREFIX/Python-aux/
@@ -229,7 +232,7 @@ env CC=clang CXX=clang++ \
 	./configure --prefix=$PREFIX/Library --enable-shared \
 	--host arm-apple-darwin --build x86_64-apple-darwin --enable-ipv6 \
 	--with-openssl=$PREFIX/Frameworks_iphoneos \
-	--with-build-python=$PREFIX/python3.11 \
+	--with-build-python=python3 \
 	--without-computed-gotos \
 	with_system_ffi=yes \
 	ac_cv_file__dev_ptmx=no \
@@ -293,3 +296,17 @@ echo done compiling cffi >> $PREFIX/make_ios.log 2>&1
 # time                                                           
 
 
+
+
+
+# 禁掉 HAVE_GETC_UNLOCKED
+# // #if defined(HAVE_GETC_UNLOCKED) && !defined(_Py_MEMORY_SANITIZER)
+# // /* clang MemorySanitizer doesn't yet understand getc_unlocked. */
+# // #define GETC(f) getc_unlocked(f)
+# // #define FLOCKFILE(f) flockfile(f)
+# // #define FUNLOCKFILE(f) funlockfile(f)
+# // #else
+# #define GETC(f) getc(f)
+# #define FLOCKFILE(f)
+# #define FUNLOCKFILE(f)
+# // #endif
