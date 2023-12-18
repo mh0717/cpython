@@ -3050,7 +3050,7 @@ Py_Exit(int sts)
     //     sts = 120;
     // }
 
-    // exit(sts);
+    exit(sts);
 }
 
 
